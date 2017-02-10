@@ -8,4 +8,10 @@ var commentSchema = new Schema({
   post: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
 });
 
+// Assign custom method to model
+commentSchema.methods.upvote = function(cb) {
+  this.upvote += 1;
+  this.save(cb);
+};
+
 mongoose.model('Comment', commentSchema);
