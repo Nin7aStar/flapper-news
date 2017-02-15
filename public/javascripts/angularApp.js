@@ -16,16 +16,16 @@ function($stateProvider, $urlRouterProvider) {
             }
         }]
     })
-      .state('register', {
-          url: '/register',
-          templateUrl: '/register.html',
-          controller: AuthCtrl,
-          onEnter: ['$state', 'auth', function ($state, auth) {
-              if (auth.isLoggedIn()) {
-                  $state.go('home');
-              }
-          }]
-      })
+    .state('register', {
+        url: '/register',
+        templateUrl: '/register.html',
+        controller: AuthCtrl,
+        onEnter: ['$state', 'auth', function ($state, auth) {
+            if (auth.isLoggedIn()) {
+                $state.go('home');
+            }
+        }]
+    })
     .state('home', {
       url: '/home',
       templateUrl: '/home.html',
