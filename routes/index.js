@@ -82,6 +82,14 @@ router.put('/posts/:post/upvote', auth, function (req, res, next) {
     });
 });
 
+// Downvote posts
+router.put('/posts/:post/downvote', auth, function (req, res, next) {
+    req.post.downvote(function (err, post) {
+        if (err) { return next(err); }
+        res.json(post);
+    });
+});
+
 // Upvote comment
 router.put('/posts/:post/comments/:comment/upvote', auth, function (req, res, next) {
     req.comment.upvote(function(err, comment) {
