@@ -2,7 +2,7 @@ var express = require('express');
 var passport = require('passport');
 var jwt = require('express-jwt');
 
-var router = express.Router();
+var router = express.Router();              // set the router
 
 // code from here
 var mongoose = require('mongoose');
@@ -33,8 +33,6 @@ router.post('/posts', auth, function (req, res, next) {
 
     post.save(function(err, post) {
       if (err) { return next(err); }
-
-      console.log(post);
 
       res.json(post);
     });
@@ -95,6 +93,14 @@ router.put('/posts/:post/comments/:comment/upvote', auth, function (req, res, ne
     req.comment.upvote(function(err, comment) {
         if (err) { return next(err); }
 
+        res.json(comment);
+    });
+});
+
+// Downvote comment
+router.put('/posts/:post/comments/:comment/downvote', auth, function (req, res, next) {
+    req.comment.downvote(function(err, comment) {
+        if (err) { return next(err); }
         res.json(comment);
     });
 });

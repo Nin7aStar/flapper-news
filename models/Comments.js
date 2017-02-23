@@ -2,21 +2,22 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var commentSchema = new Schema({
-  body: String,
-  author: String,
-  upvotes: {type: Number, default: 0},
-  post: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
+    body: String,
+    author: String,
+    upvotes: {type: Number, default: 0},
+    downvotes: {type: Number, default: 0},
+    post: [{ type: Schema.Types.ObjectId, ref: 'Post' }]
 });
 
 // Assign custom method to model
 commentSchema.methods.upvote = function(cb) {
-  this.upvote += 1;
+  this.upvotes += 1;
   this.save(cb);
 };
 
 // downvote method
 commentSchema.methods.downvote = function (cb) {
-    this.downvote += 1;
+    this.downvotes += 1;
     this.save(cb);
 };
 

@@ -14,7 +14,7 @@ require('./models/Comments');   // Register the Comments model
 require('./models/Users');      // Register the Users model
 require('./config/passport');   // Require the Passport
 
-
+// import router modules
 var index = require('./routes/index');
 var users = require('./routes/users');
 
@@ -35,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Initialize passport
 app.use(passport.initialize());
 
+// Set the router modules
 app.use('/', index);
 app.use('/users', users);
 
