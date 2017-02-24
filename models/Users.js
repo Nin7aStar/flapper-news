@@ -5,7 +5,20 @@ var jwt = require('jsonwebtoken');
 var Schema = mongoose.Schema;
 
 var userSchema = Schema({
-    username: { type: String, lowercase: true, unique: true},
+    username: {
+        type: String,
+        lowercase: true,
+        unique: true
+    },
+    upvotedPosts: [{
+        type: mongoose.Schmea.type.ObjectId,
+        ref: 'Post'
+    }],
+    downvotedPosts: [{
+        type: mongoose.Schmea.type.ObjectId,
+        ref: 'Post'
+    }],
+
     hash: String,
     salt: String
 });
