@@ -51,132 +51,172 @@ app.config([
 ]);
 
 // Angular service(factory)
-app.factory('posts', ['$http', 'auth', function($http, auth) {
+// postService
+app.factory('posts', [
+    '$http',
+    'auth',
+    function($http, auth) {
+        //service body
+        var o = {
+            posts: []
+        };
 
-    //service body
-    var o = {
-        posts: []
-    };
+        // get all posts
+        o.getAll = function () {
+            return $http.get('/posts').success(function (data) {
+                angular.copy(data, o.posts);
+            });
+        };
 
-    // get all posts
-    o.getAll = function () {
-        return $http.get('/posts').success(function (data) {
-            angular.copy(data, o.posts);
-        });
-    };
+        // get single post
+        o.get = function (id) {
+            return $http.get('/posts/' + id).then(function (res) {
+                return res.data;
+            });
+        };
 
-    // create new posts
-    o.create = function (post) {
-        return $http.post('/posts', post, {
-            headers: {Authorization: 'Bearer ' + auth.getToken()}
-        }).success(function(data) {
-            o.posts.push(data);
-        });
-    };
+        // create new posts
+        o.create = function (post) {
+            return $http.post('/posts', post, {
+                headers: {Authorization: 'Bearer ' + auth.getToken()}
+            }).success(function(savedPost) {
+                o.posts.push(savedPost);
+            });
+        };
 
-    // upvote the post
-    o.upvote = function (post) {
-        return $http.put('/posts/' + post._id + '/upvote', null, {
-            headers: {Authorization: 'Bearer ' + auth.getToken()}
-        }).success( function (data) {
-                post.upvotes += 1;
-        });
-    };
+        // delete posts
+        o.deletePost = function (post) {
+            return $http.delete('/posts' + post._id, {
+                headers: {
+                    Authorization: 'Bearer ' + auth.getToken()
+                }
+            }).success(function() {
+                o.posts.splice(o.posts.indexOf(post), 1);
+            });
+        };
 
-    // downvote the post
-    o.downvote = function (post) {
-        return $http.put('/posts/' + post._id + '/downvote', null, {
-            headers: {Authorization: 'Bearer ' + auth.getToken()}
-        }).success(function (data) {
-            post.downvotes += 1;
-        });
-    };
+        // upvote the post
+        o.upvote = function (post) {
+            return $http.put('/posts/' + post._id + '/upvote', null, {
+                headers: {
+                    Authorization: 'Bearer ' + auth.getToken()
+                }
+            }).success( function (data) {
+                    post.upvotes += 1;
+            });
+        };
 
-    // get single post
-    o.get = function (id) {
-        return $http.get('/posts/' + id).then(function (res) {
-            return res.data;
-        });
-    };
+        // downvote the post
+        o.downvote = function (post) {
+            return $http.put('/posts/' + post._id + '/downvote', null, {
+                headers: {
+                    Authorization: 'Bearer ' + auth.getToken()
+                }
+            }).success(function (data) {
+                post.downvotes += 1;
+            });
+        };
 
-    // add comment with post id
-    o.addComment = function (id, comment) {
-        return $http.post('/posts/' + id + '/comments', comment, {
-            headers: {Authorization: 'Bearer ' + auth.getToken()}
-        });
-    };
 
-    // upvote the comment
-    o.upvoteComment = function(post, comment) {
-        return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote', null, {
-            headers: {Authorization: 'Bearer ' + auth.getToken()}
-        }).success(function(data) {
-            comment.upvotes += 1;
-        });
-    };
+        // add comment with post id
+        o.addComment = function (id, comment) {
+            return $http.post('/posts/' + id + '/comments', comment, {
+                headers: {
+                    Authorization: 'Bearer ' + auth.getToken()
+                }
+            });
+        };
 
-    // downvote the comment
-    o.downvoteComment = function (post, comment) {
-        return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/downvote', null, {
-            headers: {Authorization: 'Bearer ' + auth.getToken()}
-        }).success(function(data) {
-            comment.downvotes += 1;
-        });
-    };
+        // upvote the comment
+        o.upvoteComment = function(post, comment) {
+            return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote', null, {
+                headers: {
+                    Authorization: 'Bearer ' + auth.getToken()
+                }
+            }).success(function(data) {
+                comment.upvotes += 1;
+            });
+        };
 
-    return o;
-}]);
+        // downvote the comment
+        o.downvoteComment = function (post, comment) {
+            return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/downvote', null, {
+                headers: {
+                    Authorization: 'Bearer ' + auth.getToken()
+                }
+            }).success(function(data) {
+                comment.downvotes += 1;
+            });
+        };
 
-//
-app.factory('auth', ['$http', '$window', function ($http, $window) {
-    var auth = {};
+        return o;
+    }
+]);
 
-    auth.saveToken = function (token) {
-        $window.localStorage['flapper-news-token'] = token;
-    };
+// authService
+app.factory('auth', [
+	'$http',
+	'$window',
+	function ($http, $window) {
+        var auth = {};
 
-    auth.getToken = function () {
-        return $window.localStorage['flapper-news-token'];
-    };
+        auth.saveToken = function (token) {
+            $window.localStorage['flapper-news-token'] = token;
+        };
 
-    auth.isLoggedIn = function(){
-        var token = auth.getToken();
+        auth.getToken = function () {
+            return $window.localStorage['flapper-news-token'];
+        };
 
-        if(token){
-            var payload = JSON.parse($window.atob(token.split('.')[1]));
-
-            return payload.exp > Date.now() / 1000;
-        } else {
-            return false;
-        }
-    };
-
-    auth.currentUser = function () {
-        if (auth.isLoggedIn()) {
+        auth.isLoggedIn = function(){
             var token = auth.getToken();
-            var payload = JSON.parse($window.atob(token.split('.')[1]));
-        }
-    };
-    
-    auth.register = function (user) {
-        return $http.post('/register', user).success(function (data) {
-            auth.saveToken(data.token);
-        });
-    };
 
-    auth.logIn = function (user) {
-        return $http.post('/login', user).success(function (data) {
-            auth.saveToken(data.token);
-        });
-    };
+            if(token){
+                var payload = JSON.parse($window.atob(token.split('.')[1]));
 
-    auth.logOut = function () {
-        $window.localStorage.removeItem('flapper-news-token');
-    };
+                return payload.exp > Date.now() / 1000;
+            } else {
+                return false;
+            }
+        };
 
-    return auth;
-}]);
+        auth.currentUser = function () {
+            if (auth.isLoggedIn()) {
+                var token = auth.getToken();
+                var payload = JSON.parse($window.atob(token.split('.')[1]));
 
+                return payload.username;
+            }
+        };
+
+        auth.currentUserId = function () {
+            if (auth.isLoggedIn()) {
+                var token = auth.getToken();
+                var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+                return payload._id;
+            }
+        };
+
+        auth.register = function (user) {
+            return $http.post('/register', user).success(function (data) {
+                auth.saveToken(data.token);
+            });
+        };
+
+        auth.logIn = function (user) {
+            return $http.post('/login', user).success(function (data) {
+                auth.saveToken(data.token);
+            });
+        };
+
+        auth.logOut = function () {
+            $window.localStorage.removeItem('flapper-news-token');
+        };
+
+        return auth;
+    }
+]);
 
 // Main controller
 app.controller('MainCtrl', [
@@ -189,10 +229,13 @@ app.controller('MainCtrl', [
     $scope.posts = posts.posts;
 
     $scope.addPost = function() {
-      if (!$scope.title || $scope.title === '') { return; }
+      if (!$scope.title || $scope.title === '') {
+      	return;
+      }
       posts.create({
           title: $scope.title,
           link: $scope.link,
+		  author: auth.currentUserId()
       });
       $scope.title = '';
       $scope.link = '';
@@ -225,7 +268,7 @@ app.controller('PostsCtrl', [
             if($scope.body === '') { return; }
             posts.addComment(post._id, {
                 body: $scope.body,
-                author: 'user',
+                author: auth.currentUserId(),
             }).success(function(comment) {
                 $scope.post.comments.push(comment);
             });

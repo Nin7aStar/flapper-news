@@ -11,11 +11,11 @@ var userSchema = Schema({
         unique: true
     },
     upvotedPosts: [{
-        type: mongoose.Schmea.type.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }],
     downvotedPosts: [{
-        type: mongoose.Schmea.type.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }],
 

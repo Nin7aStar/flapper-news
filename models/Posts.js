@@ -17,11 +17,11 @@ var postSchema = new Schema({
         default: 0
     },
     usersWhoUpvoted: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     }],
     usersWhoDownvoted: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     }],
     comments: [{
