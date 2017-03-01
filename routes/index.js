@@ -32,7 +32,9 @@ router.post('/posts', auth, function (req, res, next) {
     post.author = req.payload.username;
 
     post.save(function(err, post) {
-      if (err) { return next(err); }
+      if (err) {
+          return next(err);
+      }
 
       res.json(post);
     });
@@ -73,7 +75,7 @@ router.get('/posts/:post', function (req, res) {
 
 // Upvote posts
 router.put('/posts/:post/upvote', auth, function (req, res, next) {
-    req.post.upvote(function(err, post){
+    req.post.upvote(auth, function(err, post){
         if (err) { return next(err); }
 
         res.json(post);
