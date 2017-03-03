@@ -76,7 +76,9 @@ router.get('/posts/:post', function (req, res) {
 // Upvote posts
 router.put('/posts/:post/upvote', auth, function (req, res, next) {
     req.post.upvote(auth, function(err, post){
-        if (err) { return next(err); }
+        if (err) {
+            return next(err);
+        }
 
         res.json(post);
     });
@@ -84,6 +86,7 @@ router.put('/posts/:post/upvote', auth, function (req, res, next) {
 
 // Downvote posts
 router.put('/posts/:post/downvote', auth, function (req, res, next) {
+	console.log('Request Type:', req.method);
     req.post.downvote(function (err, post) {
         if (err) { return next(err); }
         res.json(post);
